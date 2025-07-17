@@ -1,107 +1,27 @@
-<?php
+import os
+import subprocess
 
-function banner() {
-    echo "\033[1;31m";
-    echo "  __  __       _           \n";
-    echo " |  \\/  |     | |          \n";
-    echo " | \\  / | __ _| | _____ ___\n";
-    echo " | |\\/| |/ _` | |/ / __/ _ \\\n";
-    echo " | |  | | (_| |   < (_|  __/\n";
-    echo " |_|  |_|\\__,_|_|\\_\\___\\___|\n";
-    echo "\n";
-    echo "+-----------------------------+\n";
-    echo "+ Author  : YourName          +\n";
-    echo "+ GitHub  : github.com/yourGH +\n";
-    echo "+ Tool    : Myder             +\n";
-    echo "+ Version : 0.1               +\n";
-    echo "+ Date    : " . date("d-m-Y") . "       +\n";
-    echo "+-----------------------------+\n\n";
+def localxpose_setup():
+    print("=== LocalXpose Tool ===")
+    
+    # Token ID girişini al
+    token = input("LocalXpose Token ID'nizi girin: ").strip()
+    if not token:
+        print("❌ Token ID boş olamaz!")
+        return
 
-    echo "\033[1;33m";
-    echo "--admin,   -a   Search Admin Pages\n";
-    echo "--upload,  -u   Search Upload Pages\n";
-    echo "--cms,     -c   CMS Scan\n";
-    echo "--domain,  -d   Subdomain Scan\n";
-    echo "--nmap,    -n   Nmap Port Scan\n";
-    echo "--update,  -U   Update Wordlist\n\n";
-    echo "Example: php myder.php http://example.com --admin\n\n";
-    echo "\033[0m";
-}
+    # Token ID ile kimlik doğrulama
+    print("🔐 LocalXpose kimlik doğrulaması yapılıyor...")
+    auth_result = subprocess.getoutput(f"./lx auth {token}")
+    print(auth_result)
 
-function runTool($url, $option) {
-    echo "[+] Target URL: $url\n";
-    switch ($option) {
-        case '--admin':
-        case '-a':
-            echo "[*] Searching for admin pages...\n";
-            // örnek wordlist
-            $paths = ['admin/', 'admin/login.php', 'adminpanel/'];
-            foreach ($paths as $path) {
-                $full = $url . '/' . $path;
-                $headers = @get_headers($full);
-                if ($headers && strpos($headers[0], '200')) {
-                    echo "[+] Found: $full\n";
-                }
-            }
-            break;
+    # HTTP sunucusu başlat (örnek olarak port 8080)
+    port = input("Hangi portu LocalXpose ile tünellemek istersiniz? (varsayılan: 8080): ").strip()
+    if not port:
+        port = "8080"
 
-        case '--upload':
-        case '-u':
-            echo "[*] Searching for upload pages...\n";
-            // upload wordlist
-            $paths = ['upload/', 'fileupload.php', 'uploads/'];
-            foreach ($paths as $path) {
-                $full = $url . '/' . $path;
-                $headers = @get_headers($full);
-                if ($headers && strpos($headers[0], '200')) {
-                    echo "[+] Found: $full\n";
-                }
-            }
-            break;
+    print(f"🚀 {port} portu üzerinden HTTP tüneli başlatılıyor...")
+    os.system(f"./lx tunnel http --port {port}")
 
-        case '--cms':
-        case '-c':
-            echo "[*] Detecting CMS...\n";
-            $content = @file_get_contents($url);
-            if (strpos($content, 'wp-content')) echo "[+] WordPress detected.\n";
-            elseif (strpos($content, 'Joomla!')) echo "[+] Joomla detected.\n";
-            else echo "[-] CMS not detected.\n";
-            break;
-
-        case '--domain':
-        case '-d':
-            echo "[*] Subdomain scan (simulated)...\n";
-            echo "[~] Subdomain scan feature coming soon!\n";
-            break;
-
-        case '--nmap':
-        case '-n':
-            echo "[*] Running port scan using Nmap (requires system Nmap)...\n";
-            system("nmap -F " . parse_url($url, PHP_URL_HOST));
-            break;
-
-        case '--update':
-        case '-U':
-            echo "[*] Updating wordlist...\n";
-            // Simülasyon
-            echo "[✓] Wordlist updated.\n";
-            break;
-
-        default:
-            echo "[-] Invalid option!\n";
-            break;
-    }
-}
-
-if ($argc < 3) {
-    banner();
-    exit;
-}
-
-$url = $argv[1];
-$option = $argv[2];
-
-banner();
-runTool($url, $option);
-
-?>
+if __name__ == "__main__":
+    localxpose_setup()
