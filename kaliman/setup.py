@@ -6,10 +6,10 @@ setup(
     description='Kurulu Kali Linux ortamını başlatan küçük bir Termux aracı',
     author='hahafr12',
     author_email='muhammetcanaltan39@gmail.com',
-    packages=['kaliman_launcher'],
+    packages=['kaliman-launcher'],
     entry_points={
         'console_scripts': [
-            'kaliman = kaliman_launcher.__main__:main'
+            'kaliman = kaliman-launcher.__main__:main'
         ]
     },
 )
